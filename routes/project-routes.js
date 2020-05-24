@@ -8,7 +8,7 @@ const Task = require('../models/task-model');
 
 
 // POST '/projects'
-router.post('./projects', (req,res) => {
+router.post('/projects', (req,res) => {
   const { title, description } = req.body;
 
   Project.create({ title, description, tasks: [] })
