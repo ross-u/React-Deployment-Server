@@ -14,7 +14,9 @@ const app = express();
 // MONGOOSE CONNECTION
 mongoose
   .connect(process.env.MONGODB_URI, {
+    keepAlive: true,
     useNewUrlParser: true,
+    useUnifiedTopology: true,
   })
   .then((x) => {
     console.log(
