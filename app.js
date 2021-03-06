@@ -14,14 +14,14 @@ const app = express();
 // MONGOOSE CONNECTION
 mongoose
   .connect(process.env.MONGODB_URI, {
-    useNewUrlParser: true
+    useNewUrlParser: true,
   })
-  .then(x => {
+  .then((x) => {
     console.log(
       `Connected to Mongo! Database name: "${x.connections[0].name}"`
     );
   })
-  .catch(err => {
+  .catch((err) => {
     console.error("Error connecting to mongo", err);
   });
 
@@ -38,7 +38,7 @@ app.use(express.static(path.join(__dirname, "public")));
 app.use(
   cors({
     credentials: true,
-    origin: ["http://localhost:3000"] // <== this will be the URL of our React app (it will be running on port 3000)
+    origin: ["http://localhost:3000"], // <== this will be the URL of our React app (it will be running on port 3000)
   })
 );
 
@@ -46,10 +46,23 @@ app.use(
 app.use("/api", projectRouter);
 app.use("/api", taskRouter);
 
-// ROUTE FOR SERVING REACT APP (index.html)
-app.use((req, res) => {
-  // If no routes match, send them the React HTML.
-  res.sendFile(__dirname + "/public/index.html");
+// ERROR HANDLING
+//  Catch 404 and respond with error message
+// Shows a 404 error with a message when no route is found for the request
+app.use((req, res, next) => {
+  res.status(404).json({ code: "not found" });
+});
+
+// Catch `next(err)` calls
+app.use((err, req, res, next) => {
+  // always log the error
+  console.error("ERROR", req.method, req.path, err);
+
+  // only render if the error ocurred before sending the response
+  if (!res.headersSent) {
+    const statusError = err.status || "500";
+    res.status(statusError).json(err);
+  }
 });
 
 module.exports = app;
